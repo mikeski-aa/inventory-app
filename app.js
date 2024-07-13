@@ -6,6 +6,7 @@ var logger = require("morgan");
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
+const storeRouter = require("./routes/store");
 
 const mongoose = require("mongoose");
 const { mainModule } = require("process");
@@ -15,7 +16,7 @@ var app = express();
 mongoose.set("strictQuery", false);
 
 const mongoDB =
-  "mongodb+srv://admin:Thermaltake1@cluster0.jgmw3ft.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+  "mongodb+srv://admin:Thermaltake1@cluster0.jgmw3ft.mongodb.net/inventory-management?retryWrites=true&w=majority&appName=Cluster0";
 
 // wait for db to connect, logging an error if there is a problem
 main().catch((err) => console.log(err));
@@ -35,6 +36,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
+app.use("/store", storeRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
