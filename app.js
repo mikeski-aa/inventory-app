@@ -15,7 +15,7 @@ var app = express();
 mongoose.set("strictQuery", false);
 
 const mongoDB =
-  "mongodb+srv://:Thermaltake1@cluster0.jgmw3ft.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+  "mongodb+srv://admin:Thermaltake1@cluster0.jgmw3ft.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 // wait for db to connect, logging an error if there is a problem
 main().catch((err) => console.log(err));

@@ -17,4 +17,4 @@ ItemModelSchema.virtual("url").get(function () {
   return `/item/${this._id}`;
 });
 
-module.exports = mongoose.model("ItemModel", ItemModelSchema);
+module.exports = mongoose.model("Item", ItemModelSchema);
