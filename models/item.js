@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 
 const ItemModelSchema = new Schema({
   name: { type: String, required: true, maxLength: 100 },
-  desc: { type: String, required: true, maxLength: 100 },
+  desc: { type: String, required: true, maxLength: 250 },
   category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
   price: { type: Number, required: true },
   stock_num: { type: Number, required: true },
@@ -17,4 +17,4 @@ ItemModelSchema.virtual("url").get(function () {
   return `/item/${this._id}`;
 });
 
-const ItemModel = mongoose.model("ItemModel", ItemModelSchema);
+module.exports = mongoose.model("ItemModel", ItemModelSchema);
