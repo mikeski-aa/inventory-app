@@ -12,7 +12,7 @@ exports.category_category = asyncHandler(async (req, res, next) => {
 });
 
 // GET request for creating a new item
-exports.category_create_post = asyncHandler(async (req, res, next) => {
+exports.category_create_get = asyncHandler(async (req, res, next) => {
   res.send("NOT IMPLEMENTED: GET create item");
 });
 

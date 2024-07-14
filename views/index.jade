@@ -1,5 +1,8 @@
 extends layout
 
 block content
-  h1= title
   p Welcome to #{title}
+  p Our store currently holds 
+  ul 
+    li #{item_total} different items 
+    li #{category_total} different categories of items

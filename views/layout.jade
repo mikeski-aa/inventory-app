@@ -4,4 +4,23 @@ html
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
-    block content
+    div(class='container-fluid')
+      div(class='row')
+        div(class='col-sm-2')
+          block sidebar
+            ul(class='sidebar-nav')
+              li
+                a(href='/store') Home
+              li
+                a(href='/store/items') All items
+              li
+                a(href='/store/categories') All categories
+              li
+                hr
+              li
+                a(href='/store/items/create') Create new author
+              li
+                a(href='/store/categoriescreate') Create new genre
+
+
+  block content

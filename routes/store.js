@@ -3,36 +3,36 @@ const router = express.Router();
 
 // Require controller modules
 const category_Controller = require("../controllers/categoryController");
-const item_controller = require("../controllers/itemController");
+const item_Controller = require("../controllers/itemController");
 
 // All ITEM ROUTES  ///
 
 // display welcome page for store
-router.get("/", item_controller.index);
+router.get("/", item_Controller.index);
 
 // GET all items
-router.get("/items", item_controller.item_list);
+router.get("/items", item_Controller.item_list);
 
 // GET for one item
-router.get("/items/:id", item_controller.item_item);
+router.get("/items/:id", item_Controller.item_item);
 
 // GET request for creating a new item
-router.get("/items/create", item_controller.item_create_get);
+router.get("/items/create", item_Controller.item_create_get);
 
 // POST request for new item
-router.post("/items/create", item_controller.item_create_post);
+router.post("/items/create", item_Controller.item_create_post);
 
 // GET request to delete an item
-router.get("/items/:id/delete", item_controller.item_delete_get);
+router.get("/items/:id/delete", item_Controller.item_delete_get);
 
 // POST request to delete an item
-router.post("/items/:id/delete", item_controller.item_delete_post);
+router.post("/items/:id/delete", item_Controller.item_delete_post);
 
 // GET request to update an item
-router.get("/items/:id/update", item_controller.item_update_get);
+router.get("/items/:id/update", item_Controller.item_update_get);
 
 // POST request to update an item
-router.post("/items/:id/update", item_controller.item_update_post);
+router.post("/items/:id/update", item_Controller.item_update_post);
 
 // ALL CATEGORY ROUTES //
 

@@ -1,9 +1,19 @@
 const Item = require("../models/item");
+const Category = require("../models/category");
 const asyncHandler = require("express-async-handler");
 
 // display welcome page for store
 exports.index = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Home Page");
+  const [numItems, numCategories] = await Promise.all([
+    Item.countDocuments({}).exec(),
+    Category.countDocuments({}).exec(),
+  ]);
+
+  res.render("index", {
+    title: "Store home",
+    item_total: numItems,
+    category_total: numCategories,
+  });
 });
 
 // GET all items
@@ -17,7 +27,7 @@ exports.item_item = asyncHandler(async (req, res, next) => {
 });
 
 // GET request for creating a new item
-exports.item_create_post = asyncHandler(async (req, res, next) => {
+exports.item_create_get = asyncHandler(async (req, res, next) => {
   res.send("NOT IMPLEMENTED: GET create item");
 });
 
