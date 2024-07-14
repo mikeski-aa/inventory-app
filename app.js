@@ -16,15 +16,17 @@ var app = express();
 mongoose.set("strictQuery", false);
 
 const mongoDB =
-  // wait for db to connect, logging an error if there is a problem
-  main().catch((err) => console.log(err));
+  "mongodb+srv://admin:Thermaltake1@cluster0.jgmw3ft.mongodb.net/inventory-management?retryWrites=true&w=majority&appName=Cluster0";
+
+// wait for db to connect, logging an error if there is a problem
+main().catch((err) => console.log(err));
 async function main() {
   await mongoose.connect(mongoDB);
 }
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "jade");
+app.set("view engine", "pug");
 
 app.use(logger("dev"));
 app.use(express.json());

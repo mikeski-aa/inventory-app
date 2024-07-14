@@ -1,0 +1,11 @@
+extends layout
+
+block content
+  div(class='main-cont')
+    h1 #{title}
+    p #[strong Item:] #{item.name}
+    p #[strong Description:] #{item.desc} 
+    p #[strong Price:] $ #{item.price}
+    p #[strong Category:] 
+      a(href= "/store/" + item.category.url) #{item.category.name} 
+
