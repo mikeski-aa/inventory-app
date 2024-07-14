@@ -7,7 +7,7 @@ exports.category_list = asyncHandler(async (req, res, next) => {
 });
 
 // GET for one item
-exports.category_category = asyncHandler(async (req, res, next) => {
+exports.category_detail = asyncHandler(async (req, res, next) => {
   res.send("NOT IMPLEMENTED: individual item info");
 });
 

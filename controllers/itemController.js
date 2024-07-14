@@ -18,12 +18,25 @@ exports.index = asyncHandler(async (req, res, next) => {
 
 // GET all items
 exports.item_list = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: item_list");
+  const items = await Item.find({}, "name desc price")
+    .sort({ name: 1 })
+    .populate("category")
+    .exec();
+
+  res.render("item_list", {
+    title: "List of all items in inventory",
+    items: items,
+  });
 });
 
 // GET for one item
-exports.item_item = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: individual item info");
+exports.item_detail = asyncHandler(async (req, res, next) => {
+  const item = await Item.findById(req.params.id).populate("category").exec();
+
+  res.render("item_detail", {
+    title: "Item details",
+    item: item,
+  });
 });
 
 // GET request for creating a new item

@@ -1,0 +1,14 @@
+extends layout
+
+block content
+  div(class='main-cont')
+    h1 #{title}
+    if items.length 
+      ul 
+          each item in items 
+              li 
+                a(href="/store" + item.url) #{item.name} 
+                |  #{item.desc} 
+                |  ($#{item.price})
+    else 
+      p There are no items          
