@@ -12,7 +12,7 @@ block content
             div.form-group 
                 label(for="desc") Item description:
                 br
-                input#desc.form-control(type="text", placeholder="Description for item" name="desc" required value=(undefined===item ? '' : item.desc))
+                textarea#desc.form-control(placeholder="Description for item" name="desc" required)=undefined===item ? '' : item.desc
             div.form-group 
                 label(for="price") Item price:
                 br

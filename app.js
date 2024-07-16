@@ -7,6 +7,7 @@ var logger = require("morgan");
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 const storeRouter = require("./routes/store");
+require("dotenv").config();
 
 const mongoose = require("mongoose");
 const { mainModule } = require("process");
@@ -15,9 +16,10 @@ var app = express();
 
 mongoose.set("strictQuery", false);
 
-const mongoDB =
-  // wait for db to connect, logging an error if there is a problem
-  main().catch((err) => console.log(err));
+const mongoDB = process.env.MONGODB_URL;
+
+// wait for db to connect, logging an error if there is a problem
+main().catch((err) => console.log(err));
 async function main() {
   await mongoose.connect(mongoDB);
 }

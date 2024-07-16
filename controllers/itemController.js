@@ -1,6 +1,8 @@
 const Item = require("../models/item");
 const Category = require("../models/category");
 const asyncHandler = require("express-async-handler");
+const { body, validationResult } = require("express-validator");
+const item = require("../models/item");
 
 // display welcome page for store
 exports.index = asyncHandler(async (req, res, next) => {
@@ -52,9 +54,50 @@ exports.item_create_get = asyncHandler(async (req, res, next) => {
 });
 
 // POST request for creating a new item
-exports.item_create_post = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: POST create item");
-});
+exports.item_create_post = [
+  body("name", "Item name must not be empty.")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("desc", "Item description must not be empty.")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("price", "Item price is required").trim().isNumeric().escape(),
+  body("stock_num", "Number of items in stock required")
+    .trim()
+    .isNumeric()
+    .escape(),
+  body("category", "You must select one category for this item")
+    .trim()
+    .escape(),
+
+  asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+
+    const newItem = new Item({
+      name: req.body.name,
+      desc: req.body.desc,
+      category: req.body.category,
+      price: req.body.price,
+      stock_num: req.body.stock_num,
+    });
+
+    if (!errors.isEmpty()) {
+      const categories = await Category.find().sort({ name: 1 }).exec();
+      // errors are present
+      res.render("item_form", {
+        title: "Add a new item",
+        categories: categories,
+        errors: errors.array(),
+      });
+    } else {
+      // data is valid, save the new item!
+      await newItem.save();
+      res.redirect("/store" + newItem.url);
+    }
+  }),
+];
 
 // GET request for deleting an item
 exports.item_delete_get = asyncHandler(async (req, res, next) => {
@@ -68,10 +111,58 @@ exports.item_delete_post = asyncHandler(async (req, res, next) => {
 
 // GET request for updating an item
 exports.item_update_get = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Update GET for item");
+  const [item, allCategories] = await Promise.all([
+    Item.findById(req.params.id).populate("category").exec(),
+    Category.find({}).exec(),
+  ]);
+
+  res.render("item_form", {
+    title: "Update item information",
+    item: item,
+    categories: allCategories,
+  });
 });
 
 // post request for updating an item
-exports.item_update_post = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Update POST for item");
-});
+exports.item_update_post = [
+  body("name", "Item name required").trim().isLength({ min: 1 }).escape(),
+  body("desc", "Description is required").trim().isLength({ min: 1 }).escape(),
+  body("price", "Item price is required").trim().escape(),
+  body("stock_num", "Number of items in stock is required").trim().escape(),
+  body("category", "Category is required").trim().escape(),
+
+  asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+
+    const updatedItem = new Item({
+      name: req.body.name,
+      desc: req.body.desc,
+      price: req.body.price,
+      stock_num: req.body.stock_num,
+      category: req.body.category,
+      _id: req.params.id,
+    });
+
+    if (!errors.isEmpty()) {
+      // re render form if there are errors
+      const allCategories = await Category.find({}).sort({ name: 1 }).exec();
+
+      res.render("item_form", {
+        title: "Update item",
+        item: updatedItem,
+        categories: allCategories,
+        errors: errors.array(),
+      });
+      return;
+    } else {
+      // valid data, let's update record
+      const newItem = await Item.findByIdAndUpdate(
+        req.params.id,
+        updatedItem,
+        {}
+      );
+
+      res.redirect("/store" + newItem.url);
+    }
+  }),
+];

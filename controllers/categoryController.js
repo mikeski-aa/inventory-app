@@ -1,6 +1,7 @@
 const Category = require("../models/category");
 const Item = require("../models/item");
 const asyncHandler = require("express-async-handler");
+const { body, validationResult } = require("express-validator");
 
 // GET all items
 exports.category_list = asyncHandler(async (req, res, next) => {
@@ -40,10 +41,38 @@ exports.category_create_get = asyncHandler(async (req, res, next) => {
 });
 
 // POST request for creating a new category
-exports.category_create_post = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: POST create category");
-});
+exports.category_create_post = [
+  body("name", "Category name is required")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("desc", "Category description is required")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
 
+  asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+
+    const newCategory = new Category({
+      name: req.body.name,
+      desc: req.body.desc,
+    });
+
+    if (!errors.isEmpty()) {
+      console.log(errors);
+      // errors present, re-render
+      res.render("category_form", {
+        title: "Create new Category",
+        errors: errors.array(),
+      });
+    } else {
+      // valid addition
+      await newCategory.save();
+      res.redirect("/store/" + newCategory.url);
+    }
+  }),
+];
 // GET request for deleting an category
 exports.category_delete_get = asyncHandler(async (req, res, next) => {
   res.send("NOT IMPLEMENTED: Delete GET for category");
@@ -56,10 +85,52 @@ exports.category_delete_post = asyncHandler(async (req, res, next) => {
 
 // GET request for updating an category
 exports.category_update_get = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Update GET for category");
+  const category = await Category.findById(req.params.id).exec();
+
+  if (category === null) {
+    // category not found
+    const err = new Error("Category not found");
+    err.status = 404;
+    return next(err);
+  }
+
+  res.render("category_form", {
+    title: "Update category details",
+    category: category,
+  });
 });
 
 // post request for updating an category
-exports.category_update_post = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Update POST for category");
-});
+exports.category_update_post = [
+  body("name", "Name value is required").trim().isLength({ min: 1 }).escape(),
+  body("desc", "Description is required").trim().isLength({ min: 1 }).escape(),
+
+  asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+
+    const newCategory = new Category({
+      name: req.body.name,
+      desc: req.body.desc,
+      _id: req.params.id,
+    });
+
+    if (!errors.isEmpty()) {
+      // errors are present, rerender with error
+
+      res.render("category_form", {
+        title: "Update category",
+        category: newCategory,
+        errors: errors.array(),
+      });
+      return;
+    } else {
+      // no errors, validated data
+      const newCat = await Category.findByIdAndUpdate(
+        req.params.id,
+        newCategory,
+        {}
+      );
+      res.redirect("/store" + newCat.url);
+    }
+  }),
+];

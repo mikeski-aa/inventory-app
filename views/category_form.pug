@@ -3,17 +3,18 @@ extends layout
 block content 
     div(class="main-cont")
         h1=title 
-        form(method='POST')
-        label(for='name') Category name: 
-        br
-        input#name.form-control(type='text', placeholder='Enter category name' required value=(undefined===category?'':category.name))
-        label(for='desc') Category description: 
-        br
-        input#desc.form-control(type='text', placeholder='Enter category description' required value=(undefined===category?'':category.desc))
-        br
-        button.btn.btn-primary(type='submit') Submit 
 
-        if errors 
-            ul
-             for error in errors
-                 li!=error.msg
+        form(method='POST')
+            div.form-group
+                label(for='name') Category name: 
+                br
+                input#name.form-control(type='text', placeholder='Enter category name' name="name" required value=(undefined===category?'':category.name))
+            div.form-group
+                label(for='desc') Category description: 
+                br
+                textarea#desc.form-control(placeholder='Enter category description' name="desc" required)=undefined===category?'':category.desc
+            button.btn.btn-primary(type='submit') Submit 
+            if errors 
+                ul
+                for error in errors
+                    li!=error.msg
