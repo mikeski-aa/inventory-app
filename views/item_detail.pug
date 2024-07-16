@@ -9,4 +9,7 @@ block content
     p #[strong Category:] 
       a(href= "/store/" + item.category.url) #{item.category.name} 
     hr
-
+    p 
+    a(href="/store" + item.url + "/update") Update category
+    p 
+    a(href="/store" + item.url + "/delete") Delete category

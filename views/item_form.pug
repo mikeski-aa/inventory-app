@@ -1,0 +1,41 @@
+extends layout 
+
+block content   
+    div(class="main-cont")
+        h1=title 
+        
+        form(method="POST")
+            div.form-group 
+                label(for="name") Item name: 
+                br
+                input#name.form-control(type="text", placeholder="Name of item" name="name" required value=(undefines===item ? '' : item.name))
+            div.form-group 
+                label(for="desc") Item description:
+                br
+                input#desc.form-control(type="text", placeholder="Description for item" name="desc" required value=(undefines===item ? '' : item.desc))
+            div.form-group 
+                label(for="price") Item price:
+                br
+                input#price.form-control(type="number", placeholder="Item price" name="price" required value=(undefines===item ? '' : item.price))
+            div.form-group 
+                label(for="stock_num") Number in stock:
+                br
+                input#stock_num.form-control(type="number", placeholder="Number in stock" name="stock_num" required value=(undefines===item ? '' : item.stock_num))        
+            div.form-group
+                        label(for="category") Category: 
+                        br
+                        select#category.form-control(name="category" required)
+                            option(value='') Please select a category 
+                            for category in categories 
+                                if item 
+                                    if category._id.toString()===item.category._id.toString()
+                                        option(value=category._id selected) #{category.name}
+                                    else 
+                                        option(value=category._id) #{category.name} 
+                                else 
+                                    option(value=category._id) #{category.name}  
+            button.btn.btn-primary(type='submit') Submit 
+            if errors 
+                ul 
+                    for error in errors 
+                        li!= error.msg

@@ -41,7 +41,14 @@ exports.item_detail = asyncHandler(async (req, res, next) => {
 
 // GET request for creating a new item
 exports.item_create_get = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: GET create item");
+  const [allItems, allCategories] = await Promise.all([
+    Item.find({}).exec(),
+    Category.find({}).exec(),
+  ]);
+  res.render("item_form", {
+    title: "Create a new item",
+    categories: allCategories,
+  });
 });
 
 // POST request for creating a new item
