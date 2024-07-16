@@ -11,8 +11,13 @@ a {
   list-style: none;
   padding-top: 15px;
   padding-left: 0;
+  padding-right: 15px;
 }
 
 .sidebar-nav > li {
   padding-top: 10px;
+}
+
+.main-cont {
+  padding-left: 10px;
 }

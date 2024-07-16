@@ -8,19 +8,19 @@ block content
             div.form-group 
                 label(for="name") Item name: 
                 br
-                input#name.form-control(type="text", placeholder="Name of item" name="name" required value=(undefines===item ? '' : item.name))
+                input#name.form-control(type="text", placeholder="Name of item" name="name" required value=(undefined===item ? '' : item.name))
             div.form-group 
                 label(for="desc") Item description:
                 br
-                input#desc.form-control(type="text", placeholder="Description for item" name="desc" required value=(undefines===item ? '' : item.desc))
+                input#desc.form-control(type="text", placeholder="Description for item" name="desc" required value=(undefined===item ? '' : item.desc))
             div.form-group 
                 label(for="price") Item price:
                 br
-                input#price.form-control(type="number", placeholder="Item price" name="price" required value=(undefines===item ? '' : item.price))
+                input#price.form-control(type="number", placeholder="Item price" name="price" required value=(undefined===item ? '' : item.price))
             div.form-group 
                 label(for="stock_num") Number in stock:
                 br
-                input#stock_num.form-control(type="number", placeholder="Number in stock" name="stock_num" required value=(undefines===item ? '' : item.stock_num))        
+                input#stock_num.form-control(type="number", placeholder="Number in stock" name="stock_num" required value=(undefined===item ? '' : item.stock_num))        
             div.form-group
                         label(for="category") Category: 
                         br
