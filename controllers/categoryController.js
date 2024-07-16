@@ -75,12 +75,42 @@ exports.category_create_post = [
 ];
 // GET request for deleting an category
 exports.category_delete_get = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Delete GET for category");
+  const [category, itemsInCategory] = await Promise.all([
+    Category.findById(req.params.id).exec(),
+    Item.find({ category: req.params.id }).exec(),
+  ]);
+
+  res.render("category_delete", {
+    title: "Delete a category",
+    category: category,
+    items: itemsInCategory,
+  });
 });
 
 // POST request for deleting an category
 exports.category_delete_post = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Delete POST for category");
+  const [category, itemsInCategory] = await Promise.all([
+    Category.findById(req.params.id).exec(),
+    Item.find({ category: req.params.id }).exec(),
+  ]);
+
+  if (itemsInCategory > 0) {
+    // items belonging to category detected
+    res.render("category_delete", {
+      title: "Delete a category",
+      category: category,
+      items: itemsInCategory,
+    });
+    return;
+  } else {
+    // category has no items, safe to delete
+    await Category.findByIdAndDelete(req.body.categoryid);
+    res.redirect("/store/categories");
+  }
+
+  await Category.findByIdAndDelete(req.params.id).exec();
+
+  res.redirect("/store/categories/");
 });
 
 // GET request for updating an category

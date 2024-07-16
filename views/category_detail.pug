@@ -6,11 +6,6 @@ block content
     p #[strong Item:] #{category.name}
     p #[strong Description:] #{category.desc} 
     p #[strong Items in category:]
-    ul 
-        each item in items  
-            li 
-                a(href= "/store" + item.url) #{item.name}
-                | #{item.desc}
     hr
     p 
     a(href="/store" + category.url + "/update") Update category

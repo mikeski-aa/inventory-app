@@ -101,7 +101,17 @@ exports.item_create_post = [
 
 // GET request for deleting an item
 exports.item_delete_get = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Delete GET for item");
+  const item = await Item.findById(req.params.id).exec();
+
+  if (item === null) {
+    // item not found, redirect to items page
+    res.redirect("/store/items/");
+  } else {
+    res.render("item_delete", {
+      title: "Delete item",
+      item: item,
+    });
+  }
 });
 
 // POST request for deleting an item
