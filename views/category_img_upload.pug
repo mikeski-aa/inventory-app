@@ -15,5 +15,8 @@ block content
             button.btn.btn-primary(type='submit') Submit 
             if errors 
                 ul
-                for error in errors
-                    li!=error.msg
+                    for error in errors
+                        li!=error.msg
+            if error 
+                ul 
+                    li #{error}

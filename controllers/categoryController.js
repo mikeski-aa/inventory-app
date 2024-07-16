@@ -177,12 +177,8 @@ exports.category_image_get = asyncHandler(async (req, res, next) => {
 // post for uploading files
 exports.category_image_post = asyncHandler(async (req, res, next) => {
   const category = await Category.findById(req.params.id).exec();
-  const newCategory = new Category({
-    name: category.name,
-    desc: category.desc,
-    _id: category.id,
-    image_url: `https://res.cloudinary.com/dyev7n9en/image/upload/v1721146603/${req.params.id}.png`,
-  });
+  const img = req.file;
+
   // Cloudinary configuration
   cloudinary.config({
     cloud_name: process.env.CLOUD_NAME,
@@ -190,15 +186,18 @@ exports.category_image_post = asyncHandler(async (req, res, next) => {
     api_secret: process.env.API_SECRET,
   });
 
-  if (req.file.path === undefined) {
+  if (img === undefined) {
     // submit pressed with no file, re render with error
     res.render("category_img_upload", {
       title: "Upload category image",
-      errors: "You must select a file to upload",
+      error: "Make sure you have attached a file!",
     });
+    return;
   }
 
-  const uploadedResult = await cloudinary.uploader
+  await cloudinary.uploader.destroy(req.params.id, { resource_type: "raw" });
+
+  const response = await cloudinary.uploader
     .upload(req.file.path, {
       public_id: req.params.id,
     })
@@ -206,8 +205,17 @@ exports.category_image_post = asyncHandler(async (req, res, next) => {
       console.log(error);
     });
 
-  await Category.findByIdAndUpdate(req.params.id, newCategory, {});
+  // update category with new URL
+  const newCategory = new Category({
+    name: category.name,
+    desc: category.desc,
+    _id: category.id,
+    image_url: response.url,
+  });
 
-  console.log(uploadedResult);
+  await Category.findByIdAndUpdate(req.params.id, newCategory, {});
+  console.log(response.url);
+  console.log("test");
+  // console.log(uploadedResult);
   res.redirect("/store/" + newCategory.url);
 });

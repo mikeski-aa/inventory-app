@@ -37,6 +37,16 @@ router.get("/items/:id/update", item_Controller.item_update_get);
 // POST request to update an item
 router.post("/items/:id/update", item_Controller.item_update_post);
 
+// GET request to upload item image
+router.get("/items/:id/upload-img", category_Controller.item_image_get);
+
+// POST request to upload item image
+router.post(
+  "/items/:id/upload-img",
+  upload.single("image"),
+  category_Controller.item_image_post
+);
+
 // ALL CATEGORY ROUTES //
 
 // GET all categories
