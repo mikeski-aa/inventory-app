@@ -5,6 +5,20 @@ const Item = require("../models/item");
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
 
+// function for checking if session is logged in
+// I know this code is the same as in the itemController file. I'm too tired to figuer it out now
+function checkSession(req, res) {
+  const sessionId = req.cookies.user_session;
+
+  if (!sessionId) {
+    res.render("login", {
+      title: "Authorized user login",
+      error: "You must be logged in to use that functionality",
+    });
+    return;
+  }
+}
+
 // GET all items
 exports.category_list = asyncHandler(async (req, res, next) => {
   const allCategories = await Category.find({}).sort({ name: 1 }).exec();
@@ -37,6 +51,7 @@ exports.category_detail = asyncHandler(async (req, res, next) => {
 
 // GET request for creating a new category
 exports.category_create_get = asyncHandler(async (req, res, next) => {
+  checkSession(req, res);
   res.render("category_form", {
     title: "Create a new Category",
   });
@@ -78,6 +93,7 @@ exports.category_create_post = [
 ];
 // GET request for deleting an category
 exports.category_delete_get = asyncHandler(async (req, res, next) => {
+  checkSession(req, res);
   const [category, itemsInCategory] = await Promise.all([
     Category.findById(req.params.id).exec(),
     Item.find({ category: req.params.id }).exec(),
@@ -131,6 +147,7 @@ exports.category_delete_post = asyncHandler(async (req, res, next) => {
 
 // GET request for updating an category
 exports.category_update_get = asyncHandler(async (req, res, next) => {
+  checkSession(req, res);
   const category = await Category.findById(req.params.id).exec();
 
   if (category === null) {
@@ -183,6 +200,7 @@ exports.category_update_post = [
 
 // GET for uploading files
 exports.category_image_get = asyncHandler(async (req, res, next) => {
+  checkSession(req, res);
   const category = await Category.findById(req.params.id).exec();
 
   if (category === null) {

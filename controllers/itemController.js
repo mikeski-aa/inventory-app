@@ -5,6 +5,19 @@ const { body, validationResult } = require("express-validator");
 const item = require("../models/item");
 const cloudinary = require("cloudinary").v2;
 
+// function for checking if session is logged in
+function checkSession(req, res) {
+  const sessionId = req.cookies.user_session;
+
+  if (!sessionId) {
+    res.render("login", {
+      title: "Authorized user login",
+      error: "You must be logged in to use that functionality",
+    });
+    return;
+  }
+}
+
 // display welcome page for store
 exports.index = asyncHandler(async (req, res, next) => {
   const [numItems, numCategories] = await Promise.all([
@@ -44,10 +57,9 @@ exports.item_detail = asyncHandler(async (req, res, next) => {
 
 // GET request for creating a new item
 exports.item_create_get = asyncHandler(async (req, res, next) => {
-  const [allItems, allCategories] = await Promise.all([
-    Item.find({}).exec(),
-    Category.find({}).exec(),
-  ]);
+  checkSession(req, res);
+  const allCategories = await Category.find({}).exec();
+
   res.render("item_form", {
     title: "Create a new item",
     categories: allCategories,
@@ -102,6 +114,7 @@ exports.item_create_post = [
 
 // GET request for deleting an item
 exports.item_delete_get = asyncHandler(async (req, res, next) => {
+  checkSession(req, res);
   const item = await Item.findById(req.params.id).exec();
 
   if (item === null) {
@@ -135,6 +148,7 @@ exports.item_delete_post = asyncHandler(async (req, res, next) => {
 
 // GET request for updating an item
 exports.item_update_get = asyncHandler(async (req, res, next) => {
+  checkSession(req, res);
   const [item, allCategories] = await Promise.all([
     Item.findById(req.params.id).populate("category").exec(),
     Category.find({}).exec(),
@@ -193,6 +207,7 @@ exports.item_update_post = [
 
 // controller for GET img upload for item
 exports.item_image_get = asyncHandler(async (req, res, next) => {
+  checkSession(req, res);
   const item = await Item.findById(req.params.id).exec();
 
   if (item === null) {

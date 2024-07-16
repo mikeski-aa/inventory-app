@@ -6,6 +6,7 @@ const upload = multer({ dest: "uploads/" });
 // Require controller modules
 const category_Controller = require("../controllers/categoryController");
 const item_Controller = require("../controllers/itemController");
+const login_Controller = require("../controllers/loginController");
 
 // All ITEM ROUTES  ///
 
@@ -84,5 +85,13 @@ router.post(
   upload.single("image"),
   category_Controller.category_image_post
 );
+
+// LOGIN page
+
+// GET login page
+router.get("/login", login_Controller.login_get);
+
+// POST login page
+router.post("/login", login_Controller.login_post);
 
 module.exports = router;

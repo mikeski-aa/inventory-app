@@ -1,6 +1,9 @@
 body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
   display: flex;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 
 a {
@@ -9,10 +12,11 @@ a {
 
 .sidebar-nav {
   list-style: none;
-  padding-top: 15px;
-  padding-left: 0;
+  padding-left: 15px;
   padding-right: 15px;
   width: 10vw;
+  background: rgb(83, 83, 83);
+  height: 100vh;
 }
 
 .sidebar-nav > li {

@@ -1,0 +1,17 @@
+extends layout 
+
+block content 
+    div(class="main-cont")
+        if loggedIn 
+            h1=loggedTitle 
+        else
+            h1=title 
+            
+            form(method="POST")
+                div.form-group
+                    label(for="password") Password: 
+                    input#password.form-control(type="password", placeholder="enter your password" name="password" required)
+                button.btn.btn-primary(type='submit') Submit 
+                if error
+                    ul
+                        li #{error}
