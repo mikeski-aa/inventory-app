@@ -124,8 +124,10 @@ exports.item_delete_post = asyncHandler(async (req, res, next) => {
     api_secret: process.env.API_SECRET,
   });
 
-  // destroy existing file to prevent duplicates
-  await cloudinary.uploader.destroy(req.body.itemid, { resource_type: "raw" });
+  await cloudinary.uploader
+    .destroy(req.params.id, {})
+    .then(console.log("image destroyed"))
+    .catch((error) => console.log(error));
 
   await Item.findByIdAndDelete(req.body.itemid);
   res.redirect("/store/items");
@@ -227,7 +229,9 @@ exports.item_image_post = asyncHandler(async (req, res, next) => {
   }
 
   // destroy existing file to prevent duplicates
-  await cloudinary.uploader.destroy(req.params.id, { resource_type: "raw" });
+  await cloudinary.uploader
+    .destroy(req.params.id, { resource_type: "raw" })
+    .catch((error) => console.log(error));
 
   const response = await cloudinary.uploader
     .upload(req.file.path, { public_id: req.params.id })

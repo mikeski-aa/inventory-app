@@ -114,9 +114,10 @@ exports.category_delete_post = asyncHandler(async (req, res, next) => {
     });
 
     // destroy existing file to prevent duplicates
-    await cloudinary.uploader.destroy(req.body.categoryid, {
-      resource_type: "raw",
-    });
+    await cloudinary.uploader
+      .destroy(req.params.id, {})
+      .then(console.log("image destroyed"))
+      .catch((error) => console.log(error));
 
     // category has no items, safe to delete
     await Category.findByIdAndDelete(req.body.categoryid);
