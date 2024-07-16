@@ -116,7 +116,8 @@ exports.item_delete_get = asyncHandler(async (req, res, next) => {
 
 // POST request for deleting an item
 exports.item_delete_post = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Delete POST for item");
+  await Item.findByIdAndDelete(req.body.itemid);
+  res.redirect("/store/items");
 });
 
 // GET request for updating an item
