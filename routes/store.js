@@ -62,10 +62,13 @@ router.get("/categories/:id/update", category_Controller.category_update_get);
 router.post("/categories/:id/update", category_Controller.category_update_post);
 
 // GET request to upload category image
-router.get("/categories/:id/uploadimg", category_Controller.category_image_get);
+router.get(
+  "/categories/:id/upload-img",
+  category_Controller.category_image_get
+);
 // POST request to upload category image
 router.get(
-  "/categories/:id/uploadimg",
+  "/categories/:id/upload-img",
   category_Controller.category_image_post
 );
 

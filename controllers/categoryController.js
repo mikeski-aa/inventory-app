@@ -170,7 +170,7 @@ exports.category_update_post = [
 
 // GET for uploading files
 exports.category_image_get = asyncHandler(async (req, res, next) => {
-  const category = await Category.findById(req.params.id);
+  const category = await Category.findById(req.params.id).exec();
 
   res.render("category_img_upload", {
     title: "Upload category image",
@@ -178,5 +178,26 @@ exports.category_image_get = asyncHandler(async (req, res, next) => {
 });
 // post for uploading files
 exports.category_image_post = asyncHandler(async (req, res, next) => {
-  res.send("IMAGE UPLOAD SET NOT IMPLEMENTED");
+  cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET,
+  });
+
+  try {
+    const uploadedFile = await upload.single("image")(req, res);
+
+    if (!uploadedFile) {
+      return res.status(400).json({ error: "No image uploaded" });
+    }
+
+    const result = await cloudinary.uploader.upload(uploadedFile.path, {
+      folder: "folder_name",
+    });
+    // send cloudinary url in response
+    res.json({ imageUrl: result.secure_url });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error uploading image to cloudinary" });
+  }
 });
