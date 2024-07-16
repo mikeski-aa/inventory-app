@@ -6,6 +6,7 @@ const Schema = mongoose.Schema;
 const CategoryModelSchema = new Schema({
   name: { type: String, required: true, maxLength: 100 },
   desc: { type: String, required: true, maxLength: 100 },
+  image_url: { type: String },
 });
 
 // virtual for URL

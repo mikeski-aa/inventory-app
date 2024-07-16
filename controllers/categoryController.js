@@ -2,6 +2,8 @@ const Category = require("../models/category");
 const Item = require("../models/item");
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
 
 // GET all items
 exports.category_list = asyncHandler(async (req, res, next) => {
@@ -57,6 +59,7 @@ exports.category_create_post = [
     const newCategory = new Category({
       name: req.body.name,
       desc: req.body.desc,
+      image_url: "",
     });
 
     if (!errors.isEmpty()) {
@@ -164,3 +167,16 @@ exports.category_update_post = [
     }
   }),
 ];
+
+// GET for uploading files
+exports.category_image_get = asyncHandler(async (req, res, next) => {
+  const category = await Category.findById(req.params.id);
+
+  res.render("category_img_upload", {
+    title: "Upload category image",
+  });
+});
+// post for uploading files
+exports.category_image_post = asyncHandler(async (req, res, next) => {
+  res.send("IMAGE UPLOAD SET NOT IMPLEMENTED");
+});

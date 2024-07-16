@@ -5,9 +5,12 @@ block content
     h1 #{title}
     p #[strong Item:] #{category.name}
     p #[strong Description:] #{category.desc} 
-    p #[strong Items in category:]
+    img(src=category.image_url width=250)
     hr
     p 
     a(href="/store" + category.url + "/update") Update category
     p 
     a(href="/store" + category.url + "/delete") Delete category
+    hr
+    p 
+    a(href="/store" + category.url + "/uploadimg") Upload new image for this category
