@@ -1,9 +1,9 @@
+const cloudinary = require("cloudinary").v2;
+const category = require("../models/category");
 const Category = require("../models/category");
 const Item = require("../models/item");
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
-const multer = require("multer");
-const upload = multer({ dest: "uploads/" });
 
 // GET all items
 exports.category_list = asyncHandler(async (req, res, next) => {
@@ -170,34 +170,44 @@ exports.category_update_post = [
 
 // GET for uploading files
 exports.category_image_get = asyncHandler(async (req, res, next) => {
-  const category = await Category.findById(req.params.id).exec();
-
   res.render("category_img_upload", {
     title: "Upload category image",
   });
 });
 // post for uploading files
 exports.category_image_post = asyncHandler(async (req, res, next) => {
+  const category = await Category.findById(req.params.id).exec();
+  const newCategory = new Category({
+    name: category.name,
+    desc: category.desc,
+    _id: category.id,
+    image_url: `https://res.cloudinary.com/dyev7n9en/image/upload/v1721146603/${req.params.id}.png`,
+  });
+  // Cloudinary configuration
   cloudinary.config({
     cloud_name: process.env.CLOUD_NAME,
     api_key: process.env.API_KEY,
     api_secret: process.env.API_SECRET,
   });
 
-  try {
-    const uploadedFile = await upload.single("image")(req, res);
-
-    if (!uploadedFile) {
-      return res.status(400).json({ error: "No image uploaded" });
-    }
-
-    const result = await cloudinary.uploader.upload(uploadedFile.path, {
-      folder: "folder_name",
+  if (req.file.path === undefined) {
+    // submit pressed with no file, re render with error
+    res.render("category_img_upload", {
+      title: "Upload category image",
+      errors: "You must select a file to upload",
     });
-    // send cloudinary url in response
-    res.json({ imageUrl: result.secure_url });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error uploading image to cloudinary" });
   }
+
+  const uploadedResult = await cloudinary.uploader
+    .upload(req.file.path, {
+      public_id: req.params.id,
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+
+  await Category.findByIdAndUpdate(req.params.id, newCategory, {});
+
+  console.log(uploadedResult);
+  res.redirect("/store/" + newCategory.url);
 });

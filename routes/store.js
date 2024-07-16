@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
 
 // Require controller modules
 const category_Controller = require("../controllers/categoryController");
@@ -67,8 +69,9 @@ router.get(
   category_Controller.category_image_get
 );
 // POST request to upload category image
-router.get(
+router.post(
   "/categories/:id/upload-img",
+  upload.single("image"),
   category_Controller.category_image_post
 );
 
