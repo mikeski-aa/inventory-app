@@ -8,8 +8,12 @@ block content
     p #[strong Price:] $ #{item.price}
     p #[strong Category:] 
       a(href= "/store/" + item.category.url) #{item.category.name} 
+    img(src=item.image_url width=250)
     hr
     p 
     a(href="/store" + item.url + "/update") Update item
     p 
     a(href="/store" + item.url + "/delete") Delete item
+    hr
+    p 
+    a(href="/store" + item.url + "/upload-img") Upload new image for this item

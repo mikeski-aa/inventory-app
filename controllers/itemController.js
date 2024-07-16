@@ -3,6 +3,7 @@ const Category = require("../models/category");
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
 const item = require("../models/item");
+const cloudinary = require("cloudinary").v2;
 
 // display welcome page for store
 exports.index = asyncHandler(async (req, res, next) => {
@@ -116,6 +117,16 @@ exports.item_delete_get = asyncHandler(async (req, res, next) => {
 
 // POST request for deleting an item
 exports.item_delete_post = asyncHandler(async (req, res, next) => {
+  // delete images when item is deleted
+  cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET,
+  });
+
+  // destroy existing file to prevent duplicates
+  await cloudinary.uploader.destroy(req.body.itemid, { resource_type: "raw" });
+
   await Item.findByIdAndDelete(req.body.itemid);
   res.redirect("/store/items");
 });
@@ -177,3 +188,63 @@ exports.item_update_post = [
     }
   }),
 ];
+
+// controller for GET img upload for item
+exports.item_image_get = asyncHandler(async (req, res, next) => {
+  const item = await Item.findById(req.params.id).exec();
+
+  if (item === null) {
+    // item not found redirect to items page
+    res.redirect("/store/items");
+  }
+
+  res.render("item_img_upload", {
+    title: "Upload new item image",
+    item: item,
+  });
+});
+
+// controller for POST img upload for item
+exports.item_image_post = asyncHandler(async (req, res, next) => {
+  const item = await Item.findById(req.params.id).exec();
+  const img = req.file;
+
+  // Cloudinary configuration
+  cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET,
+  });
+
+  if (img === undefined) {
+    // user tried submitting without adding a file, re render with error
+    res.render("item_img_upload", {
+      title: "Upload new item image",
+      item: item,
+      error: "You must select an image to upload!",
+    });
+    return;
+  }
+
+  // destroy existing file to prevent duplicates
+  await cloudinary.uploader.destroy(req.params.id, { resource_type: "raw" });
+
+  const response = await cloudinary.uploader
+    .upload(req.file.path, { public_id: req.params.id })
+    .catch((error) => console.log(error));
+
+  // update item record
+  const newItem = new Item({
+    name: item.name,
+    desc: item.desc,
+    price: item.price,
+    stock_num: item.stock_num,
+    category: item.category,
+    _id: item._id,
+    image_url: response.url,
+  });
+
+  await Item.findByIdAndUpdate(req.params.id, newItem, {});
+
+  res.redirect("/store/" + newItem.url);
+});

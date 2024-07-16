@@ -106,6 +106,18 @@ exports.category_delete_post = asyncHandler(async (req, res, next) => {
     });
     return;
   } else {
+    // delete images when item is deleted
+    cloudinary.config({
+      cloud_name: process.env.CLOUD_NAME,
+      api_key: process.env.API_KEY,
+      api_secret: process.env.API_SECRET,
+    });
+
+    // destroy existing file to prevent duplicates
+    await cloudinary.uploader.destroy(req.body.categoryid, {
+      resource_type: "raw",
+    });
+
     // category has no items, safe to delete
     await Category.findByIdAndDelete(req.body.categoryid);
     res.redirect("/store/categories");
@@ -170,8 +182,16 @@ exports.category_update_post = [
 
 // GET for uploading files
 exports.category_image_get = asyncHandler(async (req, res, next) => {
+  const category = await Category.findById(req.params.id).exec();
+
+  if (category === null) {
+    // category not found go back to all categories
+    res.redirect("/store/categories/");
+  }
+
   res.render("category_img_upload", {
     title: "Upload category image",
+    category: category,
   });
 });
 // post for uploading files
@@ -194,7 +214,7 @@ exports.category_image_post = asyncHandler(async (req, res, next) => {
     });
     return;
   }
-
+  // destroy existing file to prevent duplicates
   await cloudinary.uploader.destroy(req.params.id, { resource_type: "raw" });
 
   const response = await cloudinary.uploader
@@ -214,8 +234,6 @@ exports.category_image_post = asyncHandler(async (req, res, next) => {
   });
 
   await Category.findByIdAndUpdate(req.params.id, newCategory, {});
-  console.log(response.url);
-  console.log("test");
-  // console.log(uploadedResult);
+
   res.redirect("/store/" + newCategory.url);
 });
