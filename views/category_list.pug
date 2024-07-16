@@ -1,0 +1,14 @@
+extends layout
+
+block content
+  div(class='main-cont')
+    h1 #{title}
+    if categories.length 
+      ul 
+          each category in categories 
+              li 
+                a(href="/store/" + category.url) #{category.name} 
+                |  #{category.desc} 
+                
+    else 
+      p There are no items          
