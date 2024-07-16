@@ -7,9 +7,15 @@ var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 const storeRouter = require("./routes/store");
 require("dotenv").config();
+const RateLimit = require("express-rate-limit");
+const limiter = RateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 20,
+});
 
 const mongoose = require("mongoose");
 const { mainModule } = require("process");
+const helmet = require("helmet");
 
 var app = express();
 
@@ -26,8 +32,15 @@ async function main() {
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
-
+app.use(limiter);
 app.use(logger("dev"));
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      "script-src": ["'self'", "code.jquery.com", "cdn.jsdelivr.net"],
+    },
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
