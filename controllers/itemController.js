@@ -2,7 +2,8 @@ const Item = require("../models/item");
 const Category = require("../models/category");
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
-const item = require("../models/item");
+const queries = require("../db/queries");
+const { query } = require("../db/pool");
 const cloudinary = require("cloudinary").v2;
 
 // function for checking if session is logged in
@@ -20,24 +21,35 @@ function checkSession(req, res) {
 
 // display welcome page for store
 exports.index = asyncHandler(async (req, res, next) => {
+  // old mongoose code
+  // const [numItems, numCategories] = await Promise.all([
+  //   Item.countDocuments({}).exec(),
+  //   Category.countDocuments({}).exec(),
+  // ]);
+
+  // new psql code
   const [numItems, numCategories] = await Promise.all([
-    Item.countDocuments({}).exec(),
-    Category.countDocuments({}).exec(),
+    queries.countAllItems(),
+    queries.countAllCats(),
   ]);
 
   res.render("index", {
     title: "Store home",
-    item_total: numItems,
-    category_total: numCategories,
+    item_total: numItems[0].total,
+    category_total: numCategories[0].total,
   });
 });
 
 // GET all items
 exports.item_list = asyncHandler(async (req, res, next) => {
-  const items = await Item.find({}, "name desc price")
-    .sort({ name: 1 })
-    .populate("category")
-    .exec();
+  // old mongoose code
+  // const items = await Item.find({}, "name desc price")
+  //   .sort({ name: 1 })
+  //   .populate("category")
+  //   .exec();
+
+  // new postgres code
+  const items = await queries.getAllItems();
 
   res.render("item_list", {
     title: "List of all items in inventory",
@@ -47,7 +59,8 @@ exports.item_list = asyncHandler(async (req, res, next) => {
 
 // GET for one item
 exports.item_detail = asyncHandler(async (req, res, next) => {
-  const item = await Item.findById(req.params.id).populate("category").exec();
+  // old mongoose code
+  // const item = await Item.findById(req.params.id).populate("category").exec();
 
   res.render("item_detail", {
     title: "Item details",
