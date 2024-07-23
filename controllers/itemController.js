@@ -61,8 +61,8 @@ exports.item_list = asyncHandler(async (req, res, next) => {
 exports.item_detail = asyncHandler(async (req, res, next) => {
   // old mongoose code
   // const item = await Item.findById(req.params.id).populate("category").exec();
-  console.log("wtf is going on");
-  console.log(req.params.id);
+
+  // new postgres code
   const item = await itemQueries.getItem(req.params.id);
   console.log(item);
 
@@ -78,7 +78,7 @@ exports.item_create_get = asyncHandler(async (req, res, next) => {
   // old mongoose code
   // const allCategories = await Category.find({}).exec();
 
-  // new
+  // new postgres code
   const allCategories = await categoryQueries.getAllCats();
   res.render("item_form", {
     title: "Create a new item",
@@ -108,26 +108,46 @@ exports.item_create_post = [
   asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
 
-    const newItem = new Item({
-      name: req.body.name,
-      desc: req.body.desc,
-      category: req.body.category,
-      price: req.body.price,
-      stock_num: req.body.stock_num,
-    });
+    // const newItem = new Item({
+    //   name: req.body.name,
+    //   description: req.body.desc,
+    //   category_id: req.body.category,
+    //   price: req.body.price,
+    //   stock_quant: req.body.stock_num,
+    //   image_url: "",
+    // });
+
+    const newItem = [
+      req.body.name,
+      req.body.desc,
+      req.body.category,
+      req.body.price,
+      req.body.stock_num,
+      "",
+    ];
 
     if (!errors.isEmpty()) {
-      const categories = await Category.find().sort({ name: 1 }).exec();
+      // old mongoose code
+      // const categories = await Category.find().sort({ name: 1 }).exec();
+
+      // new postgres code
+      const allCategories = await categoryQueries.getAllCats();
       // errors are present
       res.render("item_form", {
         title: "Add a new item",
-        categories: categories,
+        categories: allCategories,
         errors: errors.array(),
       });
     } else {
       // data is valid, save the new item!
-      await newItem.save();
-      res.redirect("/store" + newItem.url);
+      // OLD MONGOOSE CODE
+      // await newItem.save();
+
+      //new postgres code
+      await itemQueries.saveItem(newItem);
+      const savedItem = await itemQueries.getItemByName(req.body.name);
+      console.log(savedItem);
+      res.redirect("/store/items/" + savedItem[0].id);
     }
   }),
 ];
@@ -135,7 +155,12 @@ exports.item_create_post = [
 // GET request for deleting an item
 exports.item_delete_get = asyncHandler(async (req, res, next) => {
   checkSession(req, res);
-  const item = await Item.findById(req.params.id).exec();
+  // old mongoose code
+  // const item = await Item.findById(req.params.id).exec();
+  console.log(req.params.id);
+
+  // new postgres code
+  const item = await itemQueries.getItem(req.params.id);
 
   if (item === null) {
     // item not found, redirect to items page
@@ -143,7 +168,7 @@ exports.item_delete_get = asyncHandler(async (req, res, next) => {
   } else {
     res.render("item_delete", {
       title: "Delete item",
-      item: item,
+      item: item[0],
     });
   }
 });
@@ -161,23 +186,34 @@ exports.item_delete_post = asyncHandler(async (req, res, next) => {
     .destroy(req.params.id, {})
     .then(console.log("image destroyed"))
     .catch((error) => console.log(error));
-
-  await Item.findByIdAndDelete(req.body.itemid);
+  // old mongoose code
+  // await Item.findByIdAndDelete(req.body.itemid);
+  console.log("Check if req.body.itemid is loaded correctly");
+  console.log(req.body.itemid);
+  // new postgers code
+  await itemQueries.itemDelete(req.body.itemid);
   res.redirect("/store/items");
 });
 
 // GET request for updating an item
 exports.item_update_get = asyncHandler(async (req, res, next) => {
-  checkSession(req, res);
+  // checkSession(req, res);
+  // old mongoose code
+  // const [item, allCategories] = await Promise.all([
+  //   Item.findById(req.params.id).populate("category").exec(),
+  //   Category.find({}).exec(),
+  // ]);
+
+  // new postgers code
   const [item, allCategories] = await Promise.all([
-    Item.findById(req.params.id).populate("category").exec(),
-    Category.find({}).exec(),
+    itemQueries.getItem(req.params.id),
+    categoryQueries.getAllCats(),
   ]);
 
   res.render("item_form", {
     title: "Update item information",
-    item: item,
-    categories: allCategories,
+    item: item[0],
+    categories: allCategories[0],
   });
 });
 

@@ -12,7 +12,7 @@ block content
             div.form-group 
                 label(for="desc") Item description:
                 br
-                textarea#desc.form-control(placeholder="Description for item" name="desc" required)=undefined===item ? '' : item.desc
+                textarea#desc.form-control(placeholder="Description for item" name="desc" required)=undefined===item ? '' : item.description
             div.form-group 
                 label(for="price") Item price:
                 br
@@ -20,7 +20,7 @@ block content
             div.form-group 
                 label(for="stock_num") Number in stock:
                 br
-                input#stock_num.form-control(type="number", placeholder="Number in stock" name="stock_num" required value=(undefined===item ? '' : item.stock_num))        
+                input#stock_num.form-control(type="number", placeholder="Number in stock" name="stock_num" required value=(undefined===item ? '' : item.stock_quant))        
             div.form-group
                         label(for="category") Category: 
                         br
@@ -28,12 +28,10 @@ block content
                             option(value='') Please select a category 
                             for category in categories 
                                 if item 
-                                    if category._id.toString()===item.category._id.toString()
-                                        option(value=category._id selected) #{category.name}
-                                    else 
-                                        option(value=category._id) #{category.name} 
+                                    option(value=item.category_id selected) #{item.category}
+ 
                                 else 
-                                    option(value=category._id) #{category.name}  
+                                    option(value=category.id) #{category.name}  
             button.btn.btn-primary(type='submit') Submit 
             if errors 
                 ul 

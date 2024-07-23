@@ -3,12 +3,12 @@ extends layout
 block content 
     div(class="main-cont")
         h1=title 
-        p #[strong Category:] #{item.name}
-        p #[strong Description:] #{item.desc}
+        p #[strong Item:] #{item.name}
+        p #[strong Description:] #{item.description}
 
         p Do you really want to delete this Item?
 
         form(method="POST")
             div.form-group 
-                input#itemid.form-control(type="hidden", name="itemid", value=item._id)
+                input#itemid.form-control(type="hidden", name="itemid", value=item.id)
             button.btn.btn-primary(type='submit') Delete 

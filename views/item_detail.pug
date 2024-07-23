@@ -8,13 +8,13 @@ block content
     p #[strong Price:] $ #{item.price}
     p #[strong Quantity in stock:] $ #{item.stock_quant}
     p #[strong Category:] 
-      //- a(href= "/store/" + item.category.url) #{item.category.name} 
+      a(href= "/store/categories/" + item.category_id) #{item.category} 
     img(src=item.image_url width=250)
     hr
     p 
-    a(href="/store" + item.id + "/update") Update item
+    a(href="/store/items/" + item.id + "/update") Update item
     p 
-    a(href="/store" + item.id + "/delete") Delete item
+    a(href="/store/items/" + item.id + "/delete") Delete item
     hr
     p 
-    a(href="/store" + item.id + "/upload-img") Upload new image for this item
+    a(href="/store/items/" + item.id + "/upload-img") Upload new image for this item
