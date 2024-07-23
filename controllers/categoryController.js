@@ -147,12 +147,12 @@ exports.category_delete_post = asyncHandler(async (req, res, next) => {
     categoryQueries.getItemsInCategory(req.params.id),
   ]);
 
-  if (itemsInCategory > 0) {
+  if (itemsInCat.length > 0) {
     // items belonging to category detected
     res.render("category_delete", {
       title: "Delete a category",
-      category: category,
-      items: itemsInCategory,
+      category: category[0],
+      items: itemsInCat,
     });
     return;
   } else {
@@ -170,7 +170,10 @@ exports.category_delete_post = asyncHandler(async (req, res, next) => {
       .catch((error) => console.log(error));
 
     // category has no items, safe to delete
-    await Category.findByIdAndDelete(req.body.categoryid);
+    // old mongoose code
+    // await Category.findByIdAndDelete(req.body.categoryid);
+
+    await categoryQueries.deleteCat(req.body.categoryid);
     res.redirect("/store/categories");
   }
 
@@ -182,7 +185,9 @@ exports.category_delete_post = asyncHandler(async (req, res, next) => {
 // GET request for updating an category
 exports.category_update_get = asyncHandler(async (req, res, next) => {
   checkSession(req, res);
-  const category = await Category.findById(req.params.id).exec();
+  // old mongoose code
+  // const category = await Category.findById(req.params.id).exec();
+  const category = await categoryQueries.getCategory(req.params.id);
 
   if (category === null) {
     // category not found
@@ -193,7 +198,7 @@ exports.category_update_get = asyncHandler(async (req, res, next) => {
 
   res.render("category_form", {
     title: "Update category details",
-    category: category,
+    category: category[0],
   });
 });
 
@@ -205,29 +210,37 @@ exports.category_update_post = [
   asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
 
-    const newCategory = new Category({
+    // required for re-render
+    const oldCat = new Category({
       name: req.body.name,
       desc: req.body.desc,
       _id: req.params.id,
     });
+
+    // obj not required for postgres
+    const newCategory = [req.body.name, req.body.desc, req.params.id];
 
     if (!errors.isEmpty()) {
       // errors are present, rerender with error
 
       res.render("category_form", {
         title: "Update category",
-        category: newCategory,
+        category: oldCat,
         errors: errors.array(),
       });
       return;
     } else {
       // no errors, validated data
-      const newCat = await Category.findByIdAndUpdate(
-        req.params.id,
-        newCategory,
-        {}
-      );
-      res.redirect("/store" + newCat.url);
+      // old mongoose code
+      // const newCat = await Category.findByIdAndUpdate(
+      //   req.params.id,
+      //   newCategory,
+      //   {}
+      // );
+
+      // new postgres code
+      await categoryQueries.updateCategory(newCategory);
+      res.redirect("/store/categories/" + req.params.id);
     }
   }),
 ];

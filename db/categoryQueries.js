@@ -73,10 +73,38 @@ async function getCatByName(name) {
   }
 }
 
+async function deleteCat(catID) {
+  try {
+    const myQuery = {
+      text: `DELETE FROM categories WHERE id = $1`,
+      values: [catID],
+    };
+
+    await pool.query(myQuery);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function updateCategory(values) {
+  try {
+    const myQuery = {
+      text: `UPDATE categories SET name = $1, description = $2 WHERE id = $3`,
+      values: values,
+    };
+
+    await pool.query(myQuery);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 module.exports = {
   getAllCats,
   getItemsInCategory,
   getCategory,
   createCategory,
   getCatByName,
+  deleteCat,
+  updateCategory,
 };
