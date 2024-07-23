@@ -99,6 +99,19 @@ async function updateCategory(values) {
   }
 }
 
+async function updateCategoryImageUpload(values) {
+  try {
+    const myQuery = {
+      text: `UPDATE categories SET name = $1, description = $2, image_url = $4 WHERE id = $3`,
+      values: values,
+    };
+
+    await pool.query(myQuery);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 module.exports = {
   getAllCats,
   getItemsInCategory,
@@ -107,4 +120,5 @@ module.exports = {
   getCatByName,
   deleteCat,
   updateCategory,
+  updateCategoryImageUpload,
 };

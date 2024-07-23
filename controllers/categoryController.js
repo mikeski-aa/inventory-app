@@ -187,6 +187,8 @@ exports.category_update_get = asyncHandler(async (req, res, next) => {
   checkSession(req, res);
   // old mongoose code
   // const category = await Category.findById(req.params.id).exec();
+
+  // new postgres code
   const category = await categoryQueries.getCategory(req.params.id);
 
   if (category === null) {
@@ -248,7 +250,11 @@ exports.category_update_post = [
 // GET for uploading files
 exports.category_image_get = asyncHandler(async (req, res, next) => {
   checkSession(req, res);
-  const category = await Category.findById(req.params.id).exec();
+  // old mongoose code
+  // const category = await Category.findById(req.params.id).exec();
+
+  // new postgres code
+  const category = await categoryQueries.getCategory(req.params.id);
 
   if (category === null) {
     // category not found go back to all categories
@@ -257,12 +263,16 @@ exports.category_image_get = asyncHandler(async (req, res, next) => {
 
   res.render("category_img_upload", {
     title: "Upload category image",
-    category: category,
+    category: category[0],
   });
 });
 // post for uploading files
 exports.category_image_post = asyncHandler(async (req, res, next) => {
-  const category = await Category.findById(req.params.id).exec();
+  // old mongoose code
+  // const category = await Category.findById(req.params.id).exec();
+
+  // new postgres code
+  const category = await categoryQueries.getCategory(req.params.id);
   const img = req.file;
 
   // Cloudinary configuration
@@ -277,6 +287,7 @@ exports.category_image_post = asyncHandler(async (req, res, next) => {
     res.render("category_img_upload", {
       title: "Upload category image",
       error: "Make sure you have attached a file!",
+      category: category[0],
     });
     return;
   }
@@ -292,14 +303,24 @@ exports.category_image_post = asyncHandler(async (req, res, next) => {
     });
 
   // update category with new URL
-  const newCategory = new Category({
-    name: category.name,
-    desc: category.desc,
-    _id: category.id,
-    image_url: response.url,
-  });
+  // old mongoose code
+  // const newCategory = new Category({
+  //   name: category.name,
+  //   desc: category.desc,
+  //   _id: category.id,
+  //   image_url: response.url,
+  // });
+  // await Category.findByIdAndUpdate(req.params.id, newCategory, {});
 
-  await Category.findByIdAndUpdate(req.params.id, newCategory, {});
+  // new postgres code
+  const newCategory = [
+    category[0].name,
+    category[0].description,
+    category[0].id,
+    response.url,
+  ];
 
-  res.redirect("/store/" + newCategory.url);
+  await categoryQueries.updateCategoryImageUpload(newCategory);
+
+  res.redirect("/store/categories/" + category[0].id);
 });
