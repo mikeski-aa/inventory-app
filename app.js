@@ -12,22 +12,35 @@ const limiter = RateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
   max: 20,
 });
+const pool = require("./db/pool");
 
-const mongoose = require("mongoose");
+// const mongoose = require("mongoose");
 const { mainModule } = require("process");
 const helmet = require("helmet");
 
 var app = express();
 
-mongoose.set("strictQuery", false);
+// mongoose.set("strictQuery", false);
 
 const mongoDB = process.env.MONGODB_URL;
 
 // wait for db to connect, logging an error if there is a problem
-main().catch((err) => console.log(err));
-async function main() {
-  await mongoose.connect(mongoDB);
+// main().catch((err) => console.log(err));
+// async function main() {
+//   await mongoose.connect(mongoDB);
+// }
+
+// connect to DB created in neon
+async function getPgVersion() {
+  const client = await pool.connect();
+  try {
+    const result = await client.query("SELECT version()");
+    console.log(result.rows[0]);
+  } finally {
+    client.release();
+  }
 }
+getPgVersion();
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
