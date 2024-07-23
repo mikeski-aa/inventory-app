@@ -25,7 +25,7 @@ async function countAllCats() {
 // query -> get all items
 async function getAllItems() {
   try {
-    const { rows } = await pool.query("SELECT * FROM items");
+    const { rows } = await pool.query("SELECT * FROM items ORDER BY name ASC");
     return rows;
   } catch (error) {
     console.log(error);
@@ -37,7 +37,7 @@ async function getItem(itemId) {
   try {
     const myQuery = {
       text: `SELECT items.id, items.name AS name, items.description, items.price, items.stock_quant, 
-      items.category_id, categories.name AS category 
+      items.category_id, categories.name AS category, items.image_url
       FROM items JOIN categories ON categories.id = items.category_id
       WHERE items.id = $1;`,
       values: [itemId],
@@ -101,7 +101,7 @@ async function itemDelete(itemid) {
 async function itemUpdate(newItem) {
   try {
     myQuery = {
-      text: `UPDATE items SET name = $1, description = $2, category_id = $3, price = $4, stock_quant = $5 WHERE id = $6`,
+      text: `UPDATE items SET name = $1, description = $2, category_id = $3, price = $4, stock_quant = $5, image_url = $7 WHERE id = $6`,
       values: newItem,
     };
 

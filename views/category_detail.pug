@@ -2,16 +2,20 @@ extends layout
 
 block content
   div(class='main-cont')
-    alert("test")
     h1 #{title}
-    p #[strong Item:] #{category.name}
-    p #[strong Description:] #{category.desc} 
+    p #[strong Category:] #{category.name}
+    p #[strong Description:] #{category.description} 
     img(src=category.image_url width=250)
+    p Items present in cetegory:
+    ul 
+      each item in items 
+        li 
+          a(href=`/store/items/${item.id}`)=item.name
     hr
     p 
-    a(href="/store" + category.url + "/update") Update category
+    a(href="/store/categories/" + category.id + "/update") Update category
     p 
-    a(href="/store" + category.url + "/delete") Delete category
+    a(href="/store/categories/" + category.id + "/delete") Delete category
     hr
     p 
-    a(href="/store" + category.url + "/upload-img") Upload new image for this category
+    a(href="/store/categories/" + category.id + "/upload-img") Upload new image for this category

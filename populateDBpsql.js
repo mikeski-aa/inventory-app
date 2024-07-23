@@ -10,13 +10,13 @@ price FLOAT,
 stock_quant INTEGER,
 image_url VARCHAR (255));
 
-CREATE TABLE IF NOT EXISTS categories (id SERIAL PRIMARY KEY, name VARCHAR(100), description TEXT);`;
+CREATE TABLE IF NOT EXISTS categories (id SERIAL PRIMARY KEY, name VARCHAR(100), description TEXT, image_url VARCHAR (255));`;
 
 const populateCategories = `
-INSERT INTO categories (name, description) VALUES ('Electronics', 'Electronic components and computers');
-INSERT INTO categories (name, description) VALUES ('Apparel', 'Clothing items and other wearables');
-INSERT INTO categories (name, description) VALUES ('Bikes', 'Bicycles and e-bikes');
-INSERT INTO categories (name, description) VALUES ('Tea', 'Various tea flavours');
+INSERT INTO categories (name, description, image_url) VALUES ('Electronics', 'Electronic components and computers', '');
+INSERT INTO categories (name, description, image_url) VALUES ('Apparel', 'Clothing items and other wearables', '');
+INSERT INTO categories (name, description, image_url) VALUES ('Bikes', 'Bicycles and e-bikes', '');
+INSERT INTO categories (name, description, image_url) VALUES ('Tea', 'Various tea flavours', '');
 
 `;
 
@@ -86,7 +86,7 @@ VALUES ('Twinings Earl Grey',
 async function dbOps(SQL) {
   const client = await pool.connect();
   try {
-    await client.query(SQL);
+    await client.query(SQL).then(console.log("DB OP FINISHED"));
   } catch (error) {
     console.log(error);
   } finally {
@@ -94,4 +94,7 @@ async function dbOps(SQL) {
   }
 }
 
+// dbOps(createTables);
+
+// dbOps(populateCategories);
 dbOps(populateItems);

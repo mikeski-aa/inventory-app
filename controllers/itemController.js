@@ -197,7 +197,7 @@ exports.item_delete_post = asyncHandler(async (req, res, next) => {
 
 // GET request for updating an item
 exports.item_update_get = asyncHandler(async (req, res, next) => {
-  // checkSession(req, res);
+  checkSession(req, res);
   // old mongoose code
   // const [item, allCategories] = await Promise.all([
   //   Item.findById(req.params.id).populate("category").exec(),
@@ -246,6 +246,7 @@ exports.item_update_post = [
       req.body.price,
       req.body.stock_num,
       req.params.id,
+      req.body.image_url,
     ];
 
     if (!errors.isEmpty()) {
@@ -282,7 +283,11 @@ exports.item_update_post = [
 // controller for GET img upload for item
 exports.item_image_get = asyncHandler(async (req, res, next) => {
   checkSession(req, res);
-  const item = await Item.findById(req.params.id).exec();
+  // old mongoose code
+  // const item = await Item.findById(req.params.id).exec();
+
+  // new postgres code
+  const item = await itemQueries.getItem(req.params.id);
 
   if (item === null) {
     // item not found redirect to items page
@@ -291,13 +296,18 @@ exports.item_image_get = asyncHandler(async (req, res, next) => {
 
   res.render("item_img_upload", {
     title: "Upload new item image",
-    item: item,
+    item: item[0],
   });
 });
 
 // controller for POST img upload for item
 exports.item_image_post = asyncHandler(async (req, res, next) => {
-  const item = await Item.findById(req.params.id).exec();
+  // Old mongoose code
+  // const item = await Item.findById(req.params.id).exec();
+
+  // new postgres code
+  const item = await itemQueries.getItem(req.params.id);
+
   const img = req.file;
 
   // Cloudinary configuration
@@ -311,7 +321,7 @@ exports.item_image_post = asyncHandler(async (req, res, next) => {
     // user tried submitting without adding a file, re render with error
     res.render("item_img_upload", {
       title: "Upload new item image",
-      item: item,
+      item: item[0],
       error: "You must select an image to upload!",
     });
     return;
@@ -327,17 +337,31 @@ exports.item_image_post = asyncHandler(async (req, res, next) => {
     .catch((error) => console.log(error));
 
   // update item record
-  const newItem = new Item({
-    name: item.name,
-    desc: item.desc,
-    price: item.price,
-    stock_num: item.stock_num,
-    category: item.category,
-    _id: item._id,
-    image_url: response.url,
-  });
+  // object not required for postgres
+  // const newItem = new Item({
+  //   name: item.name,
+  //   desc: item.desc,
+  //   price: item.price,
+  //   stock_num: item.stock_num,
+  //   category: item.category,
+  //   _id: item._id,
+  //   image_url: response.url,
+  // });
 
-  await Item.findByIdAndUpdate(req.params.id, newItem, {});
+  const newItem = [
+    item[0].name,
+    item[0].description,
+    item[0].category_id,
+    item[0].price,
+    item[0].stock_num,
+    item[0].id,
+    response.url,
+  ];
+  // OLD MONGOOSE CODE
+  // await Item.findByIdAndUpdate(req.params.id, newItem, {});
 
-  res.redirect("/store/" + newItem.url);
+  // new postgres code
+  await itemQueries.itemUpdate(newItem);
+
+  res.redirect("/store/items/" + req.params.id);
 });

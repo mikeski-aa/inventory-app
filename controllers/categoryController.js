@@ -4,6 +4,8 @@ const Category = require("../models/category");
 const Item = require("../models/item");
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
+const itemQueries = require("../db/itemQueries");
+const categoryQueries = require("../db/categoryQueries");
 
 // function for checking if session is logged in
 // I know this code is the same as in the itemController file. I'm too tired to figuer it out now
@@ -21,7 +23,10 @@ function checkSession(req, res) {
 
 // GET all items
 exports.category_list = asyncHandler(async (req, res, next) => {
-  const allCategories = await Category.find({}).sort({ name: 1 }).exec();
+  // old mongoose code
+  // const allCategories = await Category.find({}).sort({ name: 1 }).exec();
+
+  const allCategories = await categoryQueries.getAllCats();
 
   res.render("category_list", {
     title: "Category list",
@@ -31,9 +36,16 @@ exports.category_list = asyncHandler(async (req, res, next) => {
 
 // GET for one category
 exports.category_detail = asyncHandler(async (req, res, next) => {
+  // old mongoose code
+  // const [category_found, itemsInCat] = await Promise.all([
+  //   Category.findById(req.params.id).exec(),
+  //   Item.find({ category: req.params.id }).sort("name").exec(),
+  // ]);
+
+  // new postgres code
   const [category_found, itemsInCat] = await Promise.all([
-    Category.findById(req.params.id).exec(),
-    Item.find({ category: req.params.id }).sort("name").exec(),
+    categoryQueries.getCategory(req.params.id),
+    categoryQueries.getItemsInCategory(req.params.id),
   ]);
 
   if (category_found === null) {
@@ -44,7 +56,7 @@ exports.category_detail = asyncHandler(async (req, res, next) => {
 
   res.render("category_detail", {
     title: "Category details",
-    category: category_found,
+    category: category_found[0],
     items: itemsInCat,
   });
 });
