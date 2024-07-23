@@ -28,8 +28,10 @@ block content
                             option(value='') Please select a category 
                             for category in categories 
                                 if item 
-                                    option(value=item.category_id selected) #{item.category}
- 
+                                    if item.category_id == category.id
+                                        option(value=item.category_id selected) #{item.category}
+                                    else 
+                                        option(value=category.id) #{category.name} 
                                 else 
                                     option(value=category.id) #{category.name}  
             button.btn.btn-primary(type='submit') Submit 

@@ -213,7 +213,7 @@ exports.item_update_get = asyncHandler(async (req, res, next) => {
   res.render("item_form", {
     title: "Update item information",
     item: item[0],
-    categories: allCategories[0],
+    categories: allCategories,
   });
 });
 
@@ -228,35 +228,53 @@ exports.item_update_post = [
   asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
 
-    const updatedItem = new Item({
-      name: req.body.name,
-      desc: req.body.desc,
-      price: req.body.price,
-      stock_num: req.body.stock_num,
-      category: req.body.category,
-      _id: req.params.id,
-    });
+    // old mongoose code
+    // const updatedItem = new Item({
+    //   name: req.body.name,
+    //   desc: req.body.desc,
+    //   price: req.body.price,
+    //   stock_num: req.body.stock_num,
+    //   category: req.body.category,
+    //   _id: req.params.id,
+    // });
+
+    // convert to array for postgres :)
+    const updatedItem = [
+      req.body.name,
+      req.body.desc,
+      req.body.category,
+      req.body.price,
+      req.body.stock_num,
+      req.params.id,
+    ];
 
     if (!errors.isEmpty()) {
       // re render form if there are errors
-      const allCategories = await Category.find({}).sort({ name: 1 }).exec();
+      // old mongose code
+      // const allCategories = await Category.find({}).sort({ name: 1 }).exec();
+
+      // new postgres code
+      const allCategories = await categoryQueries.getAllCats();
 
       res.render("item_form", {
         title: "Update item",
         item: updatedItem,
-        categories: allCategories,
+        categories: allCategories[0],
         errors: errors.array(),
       });
       return;
     } else {
       // valid data, let's update record
-      const newItem = await Item.findByIdAndUpdate(
-        req.params.id,
-        updatedItem,
-        {}
-      );
+      // old mongoose code
+      // const newItem = await Item.findByIdAndUpdate(
+      //   req.params.id,
+      //   updatedItem,
+      //   {}
+      // );
 
-      res.redirect("/store" + newItem.url);
+      // new postgres code
+      await itemQueries.itemUpdate(updatedItem);
+      res.redirect("/store/items/" + req.params.id);
     }
   }),
 ];

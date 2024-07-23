@@ -97,6 +97,20 @@ async function itemDelete(itemid) {
   }
 }
 
+// query -> update an item
+async function itemUpdate(newItem) {
+  try {
+    myQuery = {
+      text: `UPDATE items SET name = $1, description = $2, category_id = $3, price = $4, stock_quant = $5 WHERE id = $6`,
+      values: newItem,
+    };
+
+    await pool.query(myQuery);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 module.exports = {
   getAllItems,
   countAllCats,
@@ -105,4 +119,5 @@ module.exports = {
   saveItem,
   getItemByName,
   itemDelete,
+  itemUpdate,
 };
