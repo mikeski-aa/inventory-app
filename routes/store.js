@@ -16,7 +16,7 @@ router.get("/", item_Controller.index);
 // GET all items
 router.get("/items", item_Controller.item_list);
 
-// THIS MUST BE BEFORE ROUTES THAT DISPLAY BOOK ID (use _id)
+// THIS MUST BE BEFORE ROUTES THAT DISPLAY category ID (use _id)
 // GET request for creating a new item
 router.get("/items/create", item_Controller.item_create_get);
 

@@ -4,16 +4,17 @@ block content
   div(class='main-cont')
     h1 #{title}
     p #[strong Item:] #{item.name}
-    p #[strong Description:] #{item.desc} 
+    p #[strong Description:] #{item.description} 
     p #[strong Price:] $ #{item.price}
+    p #[strong Quantity in stock:] $ #{item.stock_quant}
     p #[strong Category:] 
-      a(href= "/store/" + item.category.url) #{item.category.name} 
+      //- a(href= "/store/" + item.category.url) #{item.category.name} 
     img(src=item.image_url width=250)
     hr
     p 
-    a(href="/store" + item.url + "/update") Update item
+    a(href="/store" + item.id + "/update") Update item
     p 
-    a(href="/store" + item.url + "/delete") Delete item
+    a(href="/store" + item.id + "/delete") Delete item
     hr
     p 
-    a(href="/store" + item.url + "/upload-img") Upload new image for this item
+    a(href="/store" + item.id + "/upload-img") Upload new image for this item

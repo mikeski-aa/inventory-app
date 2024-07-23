@@ -7,7 +7,7 @@ block content
       ul 
           each item in items 
               li 
-                a(href="/store" + item.url) #{item.name} 
+                a(href="/store/items/" + item.id) #{item.name} 
                 |  #{item.desc} 
                 |  ($#{item.price})
     else 

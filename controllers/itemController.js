@@ -2,8 +2,8 @@ const Item = require("../models/item");
 const Category = require("../models/category");
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
-const queries = require("../db/queries");
-const { query } = require("../db/pool");
+const itemQueries = require("../db/itemQueries");
+const categoryQueries = require("../db/categoryQueries");
 const cloudinary = require("cloudinary").v2;
 
 // function for checking if session is logged in
@@ -29,8 +29,8 @@ exports.index = asyncHandler(async (req, res, next) => {
 
   // new psql code
   const [numItems, numCategories] = await Promise.all([
-    queries.countAllItems(),
-    queries.countAllCats(),
+    itemQueries.countAllItems(),
+    itemQueries.countAllCats(),
   ]);
 
   res.render("index", {
@@ -49,7 +49,7 @@ exports.item_list = asyncHandler(async (req, res, next) => {
   //   .exec();
 
   // new postgres code
-  const items = await queries.getAllItems();
+  const items = await itemQueries.getAllItems();
 
   res.render("item_list", {
     title: "List of all items in inventory",
@@ -61,18 +61,25 @@ exports.item_list = asyncHandler(async (req, res, next) => {
 exports.item_detail = asyncHandler(async (req, res, next) => {
   // old mongoose code
   // const item = await Item.findById(req.params.id).populate("category").exec();
+  console.log("wtf is going on");
+  console.log(req.params.id);
+  const item = await itemQueries.getItem(req.params.id);
+  console.log(item);
 
   res.render("item_detail", {
     title: "Item details",
-    item: item,
+    item: item[0],
   });
 });
 
 // GET request for creating a new item
 exports.item_create_get = asyncHandler(async (req, res, next) => {
   checkSession(req, res);
-  const allCategories = await Category.find({}).exec();
+  // old mongoose code
+  // const allCategories = await Category.find({}).exec();
 
+  // new
+  const allCategories = await categoryQueries.getAllCats();
   res.render("item_form", {
     title: "Create a new item",
     categories: allCategories,
