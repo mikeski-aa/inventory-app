@@ -45,11 +45,38 @@ async function getCategory(catID) {
   }
 }
 
-async function createCategory() {
+async function createCategory(vals) {
   try {
+    const myQuery = {
+      text: `INSERT INTO categories (name, description, image_url) VALUES ($1, $2, $3)`,
+      values: vals,
+    };
+
+    await pool.query(myQuery);
   } catch (error) {
     console.log(error);
   }
 }
 
-module.exports = { getAllCats, getItemsInCategory, getCategory };
+// query -> get item by name
+async function getCatByName(name) {
+  try {
+    const myQuery = {
+      text: `SELECT categories.id FROM categories WHERE name = $1;`,
+      values: [name],
+    };
+
+    const { rows } = await pool.query(myQuery);
+    return rows;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+module.exports = {
+  getAllCats,
+  getItemsInCategory,
+  getCategory,
+  createCategory,
+  getCatByName,
+};

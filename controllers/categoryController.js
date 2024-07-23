@@ -83,11 +83,14 @@ exports.category_create_post = [
   asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
 
-    const newCategory = new Category({
-      name: req.body.name,
-      desc: req.body.desc,
-      image_url: "",
-    });
+    // const newCategory = new Category({
+    //   name: req.body.name,
+    //   desc: req.body.desc,
+    //   image_url: "",
+    // });
+
+    // only need array for postgres
+    const newCategory = [req.body.name, req.body.desc, ""];
 
     if (!errors.isEmpty()) {
       console.log(errors);
@@ -98,31 +101,50 @@ exports.category_create_post = [
       });
     } else {
       // valid addition
-      await newCategory.save();
-      res.redirect("/store/" + newCategory.url);
+      // old mongoose code
+      // await newCategory.save();
+
+      // new postgres code
+      await categoryQueries.createCategory(newCategory);
+      const newCat = await categoryQueries.getCatByName(req.body.name);
+      res.redirect("/store/categories/" + newCat[0].id);
     }
   }),
 ];
 // GET request for deleting an category
 exports.category_delete_get = asyncHandler(async (req, res, next) => {
   checkSession(req, res);
-  const [category, itemsInCategory] = await Promise.all([
-    Category.findById(req.params.id).exec(),
-    Item.find({ category: req.params.id }).exec(),
+  // old mongoose code
+  // const [category, itemsInCategory] = await Promise.all([
+  //   Category.findById(req.params.id).exec(),
+  //   Item.find({ category: req.params.id }).exec(),
+  // ]);
+
+  // new postgres code
+  const [category, itemsInCat] = await Promise.all([
+    categoryQueries.getCategory(req.params.id),
+    categoryQueries.getItemsInCategory(req.params.id),
   ]);
 
   res.render("category_delete", {
     title: "Delete a category",
-    category: category,
-    items: itemsInCategory,
+    category: category[0],
+    items: itemsInCat,
   });
 });
 
 // POST request for deleting an category
 exports.category_delete_post = asyncHandler(async (req, res, next) => {
-  const [category, itemsInCategory] = await Promise.all([
-    Category.findById(req.params.id).exec(),
-    Item.find({ category: req.params.id }).exec(),
+  // old mongoose code
+  // const [category, itemsInCategory] = await Promise.all([
+  //   Category.findById(req.params.id).exec(),
+  //   Item.find({ category: req.params.id }).exec(),
+  // ]);
+
+  // new postgres code
+  const [category, itemsInCat] = await Promise.all([
+    categoryQueries.getCategory(req.params.id),
+    categoryQueries.getItemsInCategory(req.params.id),
   ]);
 
   if (itemsInCategory > 0) {

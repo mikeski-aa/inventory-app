@@ -6,11 +6,12 @@ block content
     p #[strong Category:] #{category.name}
     p #[strong Description:] #{category.description} 
     img(src=category.image_url width=250)
-    p Items present in cetegory:
-    ul 
-      each item in items 
-        li 
-          a(href=`/store/items/${item.id}`)=item.name
+    if items 
+      p Items present in category:
+      ul 
+        each item in items 
+          li 
+            a(href=`/store/items/${item.id}`)=item.name
     hr
     p 
     a(href="/store/categories/" + category.id + "/update") Update category

@@ -4,20 +4,20 @@ block content
     div(class="main-cont")
         h1=title 
         p #[strong Category:] #{category.name}
-        p #[strong Description:] #{category.desc}
+        p #[strong Description:] #{category.description}
 
         if items.length
             p #[strong Delete the following items before you can delete the category:]
             ul 
                 each item in items  
                     li 
-                        a(href= "/store" + item.url) #{item.name}
+                        a(href= "/store/items/" + item.id) #{item.name}
                         br
-                        | #{item.desc}
+                        | #{item.description}
         else 
             p Do you really want to delete this Category?
 
             form(method="POST")
                 div.form-group 
-                    input#categoryid.form-control(type="hidden", name="categoryid", value=category._id)
+                    input#categoryid.form-control(type="hidden", name="categoryid", value=category.id)
                 button.btn.btn-primary(type='submit') Delete 
